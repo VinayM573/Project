@@ -1,0 +1,93 @@
+
+{% extends 'inventory/base.html' %}
+{% block title %}{{ title }} {% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="main-panel">
+<div class="container my-2">    
+    <div class="row align-items-start">
+        <div class="col-8">
+            <div class="card">
+                <div class="card-body">
+                    <div id="successMessage">
+                        {% if messages %}
+                            <div class="alert alert-success d-flex justify-content-between align-items-center alert-dismissible fade show" role="alert">
+                                {% for message in messages %}
+                                    <span>{{ message }}</span>
+                                {% endfor %}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <h4 class="card-title">RFQ</h4>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <form method="post" action="{% url 'orders' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </form>
+                            &nbsp;
+                            <form method="post" action="{% url 'clear_data' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger" onclick="return confirmDelete()">Clear Data</button>
+                            </form>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Create By</th>
+                                    <th scope="col">RFQ Id</th>
+                                    <th scope="col">RFQ Order</th>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Client</th>
+                                    <th scope="col">Valid</th>
+                                    <th scope="col">Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for crfq in crfq %}
+                                <tr>
+                                    <td>{{ crfq.created_by.name }}</td>
+                                    <td>{{ crfq.rfqid }}</td>
+                                    <td>{{ crfq.rfqorder }}</td>
+                                    <td>{{ crfq.product }}</td>
+                                    <td>{{ crfq.client }}</td>
+                                    <td>{{ crfq.valid }}</td>
+                                    <td>{{ crfq.order_quantity }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>    
+                    </div>       
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="{% url 'crfq' %}">
+                        <h4>Create RFQ</h4>
+                        <hr>
+                        {% csrf_token %}
+                        {{ form|crispy}}
+                        <br>
+                        <button type="submit" class="btn btn-primary">Create Order</button>
+                        <button type="reset" class="btn btn-danger">Reset</button>
+                    </form>
+                </div>
+            </div>
+        </div> 
+    </div>
+</div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+ <script>
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this item?');
+        }          
+        $(function() {
+            $("#id_valid").datepicker({
+                autoclose: {{ form.Meta.datepicker_options.autoclose|default:"true" }},
+            });
+        });
+        </script>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends 'inventory/base.html'%}
+{%block content%}
+<div class="columns is-centered has-text-centered">
+    <div class="column is-half">
+        <div class="card has-background-white-ter">
+            <h1 class="title is-3"></h1>
+        </div>
+    </div>
+</div>
+<form action="" method="post">{% csrf_token %}
+    <div class="card">
+        <header class="card-header">
+            <p class="card-header-title">
+                All Orders / Change Order Status &nbsp;<button class="button is-rounded is-info">
+                    <a href="" class="has-text-white">Create Invoice</a></button>
+            </p>
+        </header>
+        <div class="card-content">
+            <div class="content">
+
+                <table class="table is-fullwidth is-bordered is-hoverable is-striped">
+                    <tbody>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>INVOICE</th>
+                                <th>CUSTOMER</th>
+                                <th>DATE</th>
+                                <th>DUE DATE</th>
+                                <th>BALANCE</th>
+                                <th>TOTAL</th>
+                                <th>STATUS</th>
+                                <th>View</th>
+                                <th>DOWNLOAD</th>
+
+                            </tr>
+                        </thead>
+                        {% for invoice in invoices %}
+                        <tr>
+                            <td><input class="checkbox" type="checkbox" value="{{invoice.id}}" name="invoice_id" size="1" />
+                            </td>
+                            <td width="1%">#{{invoice.id}}</td>
+                            <td width="9%">{{invoice.customer}}</td>
+                            <td> {{invoice.date}}</td>
+                            <td> {{invoice.due_date}} </td>
+                            <td width="1%"></td>
+                            <td>{{invoice.total_amount}}</td>
+                            <td class="level-right">
+                                {% if invoice.get_status %}
+                                <a class="button is-small is-success" href="#">Paid</a>
+                                {% else %}
+                                <a class="button is-small is-warning" href="#">Not Paid</a>
+                                {% endif %}
+                            </td>
+                            <td width="1%"><a href="{% url 'EPRapp:invoice-detail' id=invoice.id %}">
+                                <div class="button is-small is-info">View</div>
+                            </a></td>
+                            <td width="1%"><a href="">Download</a></td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div><br /><br /><br />
+    <div class="card has-background-white-ter">
+        <header class="card-header">
+            <p class="card-header-title">
+                Change Order Status
+            </p>
+        </header>
+        <div class="card-content">
+            <div class="select is-rounded">
+                <select id="status" name="status">
+                    <option value="1">Paid</option>
+                    <option value="0">Not Paid</option>
+                </select>
+            </div>
+            <input class="button  is-info is-rounded" type="submit" class="btn" value="Change Status" name="mybtn">
+        </div>
+    </div>
+</form>
+{%endblock%}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} 
+{% extends 'inventory/base.html' %}
+{% block title %}{{ title }} {% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="main-panel">
+<div class="container my-2">
+        <div class="card">
+            <div class="card-body">
+                <a href="{% url 'crfq' %}">
+                    <button type="submit" class="btn btn-primary">Create RFQ</button>
+                </a>
+                <form method="post" action="{% url 'generate_pdf' %}" id="pdfForm" target="popup" onsubmit="window.open('', 'popup', 'width=600,height=600')" disableButtonAndUncheck()>
+                    {% csrf_token %}
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-success" id="generatePdfButton" disabled >Convert to PO</button>
+                    </div>
+                    <div class="table-responsive" style="max-width:970px;">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Select</th>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Created by & Date</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">RFQ Id</th>
+                                    <th scope="col">RFQ Order</th>
+                                    <th scope="col">Client</th>
+                                    <th scope="col">UOM</th>
+                                    <th scope="col">Order Price</th>
+                                    <th scope="col">Valid Till</th>
+                                    {% comment %} <th><button type="submit" class="btn btn-success" id="generatePdfButton" disabled >Convert to PO</button></th> {% endcomment %}
+                               {% comment %} </tr>
+                            </thead>
+                            <tbody>
+                                {% for crfq in crfqs %}
+                                    <tr>
+                                        <td><input type="checkbox" class="select-checkbox" name="selected_rows" value="{{ crfq.id }}"></td>
+                                        <td>{{ crfq.product }}</td>
+                                        <td>{{ crfq.created_by.name }} & {{ crfq.date }}</td>
+                                        <td>{{ crfq.order_quantity }}</td>
+                                        <td>{{ crfq.rfqid }}</td>
+                                        <td>{{ crfq.rfqorder }}</td>
+                                        <td>{{ crfq.client }}</td>
+                                        <td>{{ crfq.product.UOM}}</td>
+                                        <td>{{ crfq.product.price}}</td>
+                                        <td>{{ crfq.valid }}</td>
+                                    </tr>
+                                {% endfor %}                            
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const selectCheckboxes = document.querySelectorAll(".select-checkbox");
+      const generatePdfButton = document.getElementById("generatePdfButton");
+      const pdfForm = document.getElementById("pdfForm");
+      selectCheckboxes.forEach(function (checkbox) {
+      checkbox.addEventListener("change", function () {
+      const checkedCount = document.querySelectorAll(".select-checkbox:checked").length;
+      generatePdfButton.disabled = checkedCount === 0;
+        });
+      });
+    });  
+</script>
+{% endblock %} {% endcomment %}
